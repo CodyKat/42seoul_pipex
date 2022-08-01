@@ -3,38 +3,61 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jaemjeon <jaemjeon@student.42seoul.>       +#+  +:+       +#+        */
+/*   By: jaemjeon <jaemjeon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/26 16:03:31 by jaemjeon          #+#    #+#             */
-/*   Updated: 2022/06/29 20:16:22 by jaemjeon         ###   ########.fr       */
+/*   Created: 2022/07/18 13:31:54 by jaemjeon          #+#    #+#             */
+/*   Updated: 2022/08/02 04:13:31 by jaemjeon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
-#include <fcntl.h>
+#include "pipex.h"
 
-int	main(int argc, char **argv)
+char	**get_env_path(char *envp[])
 {
-	int		count;
-	int		pipe_fd[2];
-	char	*file_name[2];
-	char	**cmd_table;
+	while (*envp != 0 && ft_strncmp("PATH=", *envp, 5) != 0)
+		envp++;
+	return (ft_split((*envp) + 5, ':'));
+}
 
-	cmd_table = (char **)malloc(sizeof(char *) * (argc - 3));
-	file_name[0] = argv[1];
-	file_name[1] = argv[argc - 1];
-	count = 0;
-	while (count < argc -3)
+void	parsing(t_info *info, int argc, char *argv[], char *envp[])
+{
+	int	index;
+
+	index = -1;
+	if (ft_strncmp("here_doc", argv[1], ft_strlen("here_doc") + 1) == 0)
 	{
-		cmd_table[count] = argv[count + 1];
-		count++;
+		if (argc != 6)
+			ft_error_arguments();
+		info->is_heredoc = TRUE;
+		info->command_count = 2;
+		info->limiter = argv[2];
+		info->command_arr = (char **)ft_calloc(sizeof(char *), 2);
+		info->command_arr[0] = argv[3];
+		info->command_arr[1] = argv[4];
+		info->outfile_name = argv[5];
 	}
-	count = 0
-	while (count < argc - 3)
+	else
 	{
-		pipe(pipe_fd);
-		fork();
-		close(pipe_fd[0]);
-		count++;
+		info->infile_name = argv[1];
+		info->command_count = argc - 3;
+		info->command_arr = (char **)ft_calloc(sizeof(char *), argc - 3);
+		while (++index)
+			info->command_arr[index] = argv[index + 2];
+		info->outfile_name = argv[argc - 1];
 	}
+	info->env_path = get_env_path(envp);
+}
+
+int	main(int argc, char *argv[], char *envp[])
+{
+	t_info	info;
+
+	if (argc < 5)
+		ft_error_arguments();
+	parsing(&info, argc, argv, envp);
+	if (info.is_heredoc == FALSE)
+		processing_with_no_heredoc(&info);
+	else
+		processing_with_heredoc(&info);
+	return (0);
 }
