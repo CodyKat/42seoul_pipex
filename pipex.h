@@ -1,4 +1,3 @@
-
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,3 +14,9 @@ typedef	struct s_info
 	int		infile;
 	int		outfile;
 }	t_info;
+
+typedef struct s_cmd
+{
+	char	*file;
+	char	**argv;
+}	t_cmd;

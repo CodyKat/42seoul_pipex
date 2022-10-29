@@ -1,4 +1,5 @@
 #include "pipex.h"
+#define	CMD_SIZE 3
 
 void	ft_error(char *message, int exit_status)
 {
@@ -75,11 +76,83 @@ void	print_info(t_info *info)
 	printf("outfile : [name] = %s, [fd] = %d\n", info->outfile_name, info->outfile);
 }
 
-int main(int argc, char *argv[])
+void	init_cmd_arr(t_cmd *cmd_arr, int cmd_size)
 {
-	t_info	info;
-	memset(&info, 0 , sizeof(t_info));
-	parsing(&info, argc, argv);
-	print_info(&info);
+	int i;
+
+	i = 0;
+	if (cmd_size > i)
+	{
+		cmd_arr[0].file = "ls";
+		cmd_arr[0].argv[0] = "ls";
+		cmd_arr[0].argv[1] = NULL;
+		i++;
+	}
+	while (i < cmd_size)
+	{
+		cmd_arr[i].file = "cat";
+		cmd_arr[i].argv[0] = "cat";
+		cmd_arr[i].argv[1] = NULL;
+		i++;
+	}
+}
+
+void	first_process(t_cmd *cmd_arr, int *fd, int *last_output_fd)
+{
+	pid_t	pid;
+
+	pipe(fd);
+	pid = fork();
+	if (pid == 0)
+	{
+		dup2(fd[1], 1);
+	}
+	else
+	{
+		
+	}
+
+}
+
+void	middle_process(t_cmd *cmd_arr, int *fd, int *last_output_fd)
+{
+
+}
+
+void	last_process(t_cmd *cmd_arr, int *fd, int *last_output_fd)
+{
+
+}
+
+void	run_pipex(t_cmd *cmd_arr)
+{
+	int	i;
+	int	fd[2];
+	int	last_output_fd;
+
+	i = 0;
+	// CMD_SIZE == 1인 경우는 의미가 없으니 무시함
+	while (i < CMD_SIZE)
+	{
+		if (i == 0)
+			first_process(cmd_arr, fd, last_output_fd);
+		else if (i == CMD_SIZE - 1)
+			last_process(cmd_arr, fd, last_output_fd);
+		else
+			middle_process(cmd_arr, fd, last_output_fd);
+		i++;
+	}
+}
+
+int main(int argc, char *argv[], char *envp[])
+{
+	// t_info	info;
+	// memset(&info, 0 , sizeof(t_info));
+	// parsing(&info, argc, argv);
+	// print_info(&info);
+	t_cmd	cmd_arr[CMD_SIZE];
+
+	init_cmd_arr(cmd_arr, CMD_SIZE);
+	run_pipex(&cmd_arr);
 	return (0);
 }
