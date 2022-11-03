@@ -1,5 +1,4 @@
 #include "pipex.h"
-#define	CMD_SIZE 3
 
 void	ft_error(char *message, int exit_status)
 {
@@ -97,7 +96,7 @@ void	init_cmd_arr(t_cmd *cmd_arr, int cmd_size)
 	}
 }
 
-void	first_process(t_cmd *cmd_arr, int *fd, int *last_output_fd)
+pid_t	first_process(t_cmd *cmd_arr, int *fd, int *last_output_fd, char **envp)
 {
 	pid_t	pid;
 
@@ -106,40 +105,94 @@ void	first_process(t_cmd *cmd_arr, int *fd, int *last_output_fd)
 	if (pid == 0)
 	{
 		dup2(fd[1], 1);
+        close(fd[0]);
+        close(fd[1]);
+		execve(cmd_arr->file, cmd_arr->argv, envp);
+		printf("execbe failed in first_process\n");
 	}
 	else
 	{
-		
+		*last_output_fd = fd[0];
+        close(fd[1]);
 	}
-
+	return (pid);
 }
 
-void	middle_process(t_cmd *cmd_arr, int *fd, int *last_output_fd)
+pid_t	middle_process(t_cmd *cmd_arr, int *fd, int *last_output_fd, char **envp)
 {
+	pid_t	pid;
 
+	pipe(fd);
+	pid = fork();
+	if (pid == 0)
+	{
+        close(fd[0]);
+		dup2(fd[1], 1);
+		dup2(*last_output_fd, 0);
+		close(*last_output_fd);
+        close(fd[1]);
+		execve(cmd_arr->file, cmd_arr->argv, envp);
+		printf("execve failed in middle_process\n");
+	}
+	else
+	{
+		close(*last_output_fd);
+		*last_output_fd = fd[0];
+        close(fd[1]);
+	}
+	return (pid);
 }
 
-void	last_process(t_cmd *cmd_arr, int *fd, int *last_output_fd)
+pid_t	last_process(t_cmd *cmd_arr, int *fd, int *last_output_fd, char **envp)
 {
+	pid_t	pid;
 
+	pipe(fd);
+	pid = fork();
+	if (pid == 0)
+	{
+		dup2(*last_output_fd, 0);
+        close(fd[0]);
+        close(fd[1]);
+		execve(cmd_arr->file, cmd_arr->argv, envp);
+		printf("execbe failed in last_process\n");
+	}
+	else
+	{
+		close(*last_output_fd);
+		close(fd[0]);
+		close(fd[1]);
+	}
+	return (pid);
 }
 
-void	run_pipex(t_cmd *cmd_arr)
+void	run_pipex(t_cmd *cmd_arr, char **envp)
 {
 	int	i;
 	int	fd[2];
 	int	last_output_fd;
+	pid_t	ret_pid;
+	pid_t	pid_arr[CMD_SIZE];
+	int	status;
 
 	i = 0;
 	// CMD_SIZE == 1인 경우는 의미가 없으니 무시함
 	while (i < CMD_SIZE)
 	{
 		if (i == 0)
-			first_process(cmd_arr, fd, last_output_fd);
+			ret_pid = first_process(cmd_arr, fd, &last_output_fd, envp);
 		else if (i == CMD_SIZE - 1)
-			last_process(cmd_arr, fd, last_output_fd);
+			ret_pid = last_process(cmd_arr, fd, &last_output_fd, envp);
 		else
-			middle_process(cmd_arr, fd, last_output_fd);
+			ret_pid = middle_process(cmd_arr, fd, &last_output_fd, envp);
+		pid_arr[i] = ret_pid;
+		cmd_arr++;
+		i++;
+	}
+	i = 0;
+	while (i < CMD_SIZE)
+	{
+		waitpid(pid_arr[i], &status, 0);
 		i++;
 	}
 }
@@ -151,8 +204,35 @@ int main(int argc, char *argv[], char *envp[])
 	// parsing(&info, argc, argv);
 	// print_info(&info);
 	t_cmd	cmd_arr[CMD_SIZE];
+	int		i;
 
-	init_cmd_arr(cmd_arr, CMD_SIZE);
-	run_pipex(&cmd_arr);
+	i = 0;
+	while (i < CMD_SIZE)
+	{
+		cmd_arr[i].argv = malloc(sizeof(char *) * 2);
+		i++;
+	}
+
+
+	cmd_arr[0].file = "/bin/ls";
+	i = 1;
+	while (i < CMD_SIZE)
+	{
+		cmd_arr[i].file = "/bin/cat";
+		i++;
+	}
+
+
+	cmd_arr[0].argv[0] = "/bin/ls";
+	cmd_arr[0].argv[1] = NULL;
+	i = 1;
+	while (i < CMD_SIZE)
+	{
+		cmd_arr[i].argv[0] = "/bin/cat";
+		cmd_arr[i].argv[1] = NULL;
+		i++;
+	}
+	run_pipex(cmd_arr, envp);
+	sleep(100);
 	return (0);
 }

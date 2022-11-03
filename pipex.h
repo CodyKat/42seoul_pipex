@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
+#define	CMD_SIZE 100
 
 typedef	struct s_info
 {
