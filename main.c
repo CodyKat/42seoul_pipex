@@ -233,6 +233,5 @@ int main(int argc, char *argv[], char *envp[])
 		i++;
 	}
 	run_pipex(cmd_arr, envp);
-	sleep(100);
 	return (0);
 }
