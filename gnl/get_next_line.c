@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jaemjeon <jaemjeon@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: jaemjeon <jaemjeon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/25 08:24:45 by jaemjeon          #+#    #+#             */
-/*   Updated: 2022/11/19 13:50:08 by jaemjeon         ###   ########.fr       */
+/*   Updated: 2023/01/24 05:32:27 by jaemjeon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	read_once(char **save, int fd)
 		return (-1);
 	}
 	buffer[status] = '\0';
-	*save = ft_strjoin(save, buffer);
+	*save = gnl_strjoin(save, buffer);
 	free(buffer);
 	return (status);
 }
@@ -39,7 +39,7 @@ char	*get_oneline(char **save)
 
 	if (*save == 0)
 		return (0);
-	line_len = ft_strchr(*save, '\n');
+	line_len = gnl_strchr(*save, '\n');
 	if ((*save)[line_len] == '\n')
 		line_len++;
 	if (line_len == 0)
@@ -51,7 +51,7 @@ char	*get_oneline(char **save)
 		*save = 0;
 		return (0);
 	}
-	ft_memcpy(line, *save, line_len);
+	gnl_memcpy(line, *save, line_len);
 	line[line_len] = '\0';
 	return (line);
 }
@@ -70,12 +70,12 @@ void	update_save(char **save)
 		*save = 0;
 		return ;
 	}
-	total_len = ft_strchr(*save, '\0');
-	remove_len = ft_strchr(*save, '\n');
+	total_len = gnl_strchr(*save, '\0');
+	remove_len = gnl_strchr(*save, '\n');
 	if ((*save)[remove_len] == '\n')
 		remove_len++;
 	new_save = (char *)malloc(sizeof(char) * (total_len - remove_len + 1));
-	ft_memcpy(new_save, *save + remove_len, total_len - remove_len + 1);
+	gnl_memcpy(new_save, *save + remove_len, total_len - remove_len + 1);
 	free(*save);
 	*save = new_save;
 }

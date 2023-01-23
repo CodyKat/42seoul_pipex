@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jaemjeon <jaemjeon@student.42seoul.>       +#+  +:+       +#+        */
+/*   By: jaemjeon <jaemjeon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/25 15:40:56 by jaemjeon          #+#    #+#             */
-/*   Updated: 2022/03/25 21:36:05 by jaemjeon         ###   ########.fr       */
+/*   Updated: 2023/01/24 05:32:24 by jaemjeon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 
-int	ft_strchr(char *str, char to_find)
+int	gnl_strchr(char *str, char to_find)
 {
 	int	len;
 
@@ -29,7 +29,7 @@ int	ft_strchr(char *str, char to_find)
 	return (len);
 }
 
-void	*ft_memcpy(void *dst, void *src, size_t n)
+void	*gnl_memcpy(void *dst, void *src, size_t n)
 {
 	unsigned char		*p_dst;
 	unsigned char		*p_src;
@@ -45,17 +45,17 @@ void	*ft_memcpy(void *dst, void *src, size_t n)
 	return (dst);
 }
 
-char	*ft_strjoin(char **p_s1, char *s2)
+char	*gnl_strjoin(char **p_s1, char *s2)
 {
 	char	*string;
 	int		s1_len;
 	int		s2_len;
 
-	s1_len = ft_strchr(*p_s1, '\0');
-	s2_len = ft_strchr(s2, '\0');
+	s1_len = gnl_strchr(*p_s1, '\0');
+	s2_len = gnl_strchr(s2, '\0');
 	string = (char *)malloc(sizeof(char) * (s1_len + s2_len + 1));
-	ft_memcpy(string, *p_s1, s1_len);
-	ft_memcpy(string + s1_len, s2, s2_len);
+	gnl_memcpy(string, *p_s1, s1_len);
+	gnl_memcpy(string + s1_len, s2, s2_len);
 	string[s1_len + s2_len] = '\0';
 	if (*p_s1 != 0)
 		free(*p_s1);
