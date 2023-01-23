@@ -13,7 +13,7 @@ void	parse(int argc, char *argv[], t_info *info)
 	{
 		info->is_heredoc = TRUE;
 		info->cmd_cnt = argc - 4;
-		info->limiter = argv[1];
+		info->limiter = argv[2];
 		info->cmd = malloc(sizeof(char *) * info->cmd_cnt);
 		while (++i < info->cmd_cnt)
 			info->cmd[i] = argv[i + 3];
@@ -51,7 +51,6 @@ void	ft_execve(t_info *info, int cmd_cnt)
 		{
 			free(sp[0]);
 			sp[0] = access_name;
-			printf("sp[0] : %s\n", sp[0]);
 			execve(sp[0], sp, environ);
 			return ;
 		}
@@ -146,7 +145,7 @@ int	read_heredoc(t_info *info)
 	int				fd_heredoc;
 	char			*line;
 
-	fd_heredoc = open(tmpfile_name, O_WRONLY | O_CREAT, 0644);
+	fd_heredoc = open(tmpfile_name, O_RDWR | O_CREAT, 0644);
 	if (fd_heredoc == -1)
 		ft_error("heredoc tmpfile open error");
 	while (TRUE)
@@ -158,7 +157,8 @@ int	read_heredoc(t_info *info)
 			unlink(tmpfile_name);
 			exit(0);
 		}
-		else if (ft_strncmp(line, info->limiter, ft_strlen(info->limiter)) == 0)
+		else if (ft_strncmp(line, info->limiter, ft_strlen(info->limiter)) == 0 \
+					&& line[ft_strlen(line) - 1] == '\n')
 		{
 			free(line);
 			return (fd_heredoc);

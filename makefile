@@ -2,7 +2,7 @@ CC = gcc
 NAME = pipex
 NAME_LIBFT = libft/libft.a
 NAME_GNL = gnl/gnl.a
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 SRCS = main.c \
 	   utils.c
 
