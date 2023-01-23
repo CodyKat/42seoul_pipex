@@ -1,23 +1,18 @@
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <fcntl.h>
-#define	CMD_SIZE 100
+#include <unistd.h>
+#include <errno.h>
+#include "libft/libft.h"
+#include <stdio.h>
 
-typedef	struct s_info
+void	ft_error(char *message);
+
+typedef struct s_info
 {
-	char	**commands;
-	int		heredoc_count;
-	char	**limiter;
-	char	*infile_name;
-	char	*outfile_name;
-	int		infile;
-	int		outfile;
+	int		is_heredoc;
+	char	*infild;
+	char	*outfile;
+	char	*limiter;
+	int		cmd_cnt;
+	char	**cmd;
+
 }	t_info;
-
-typedef struct s_cmd
-{
-	char	*file;
-	char	**argv;
-}	t_cmd;
